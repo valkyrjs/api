@@ -16,9 +16,8 @@ jobs:
       - run: deno task test
       
   publish:
-    depends-on: test
-    
     runs-on: ubuntu-latest
+    needs: test
 
     permissions:
       contents: read
