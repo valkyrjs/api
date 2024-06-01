@@ -4,9 +4,7 @@ import {
   InternalError,
   InvalidParamsError,
   MethodNotFoundError,
-  type Notification,
-  type Params,
-  type Request,
+  type RequestCandidate,
   RpcError,
   type SuccessResponse,
 } from "@valkyr/json-rpc";
@@ -59,7 +57,7 @@ export class Api {
    * @param context - Request context to be passed to the method handler.
    */
   async handle(
-    request: Request<Params> | Notification<Params>,
+    request: RequestCandidate,
     context: RequestContext,
   ): Promise<SuccessResponse | ErrorResponse | undefined> {
     try {

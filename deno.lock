@@ -2,12 +2,12 @@
   "version": "3",
   "packages": {
     "specifiers": {
-      "jsr:@valkyr/json-rpc@1.0.0": "jsr:@valkyr/json-rpc@1.0.0",
+      "jsr:@valkyr/json-rpc@1.0.1": "jsr:@valkyr/json-rpc@1.0.1",
       "npm:zod@3.23.8": "npm:zod@3.23.8"
     },
     "jsr": {
-      "@valkyr/json-rpc@1.0.0": {
-        "integrity": "1e78c7899b302fb733b4fba2e0fb9954f9d240903f17996b92bef03ab2ca5847"
+      "@valkyr/json-rpc@1.0.1": {
+        "integrity": "aa325e19e356bd952b295c0766c3c0c5d294e8c678c3c4c193da5222235714ba"
       }
     },
     "npm": {
@@ -56,7 +56,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@valkyr/json-rpc@1.0.0",
+      "jsr:@valkyr/json-rpc@1.0.1",
       "npm:zod@3.23.8"
     ]
   }

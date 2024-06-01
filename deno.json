@@ -1,9 +1,9 @@
 {
   "name": "@valkyr/api",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "exports": "./mod.ts",
   "imports": {
-    "@valkyr/json-rpc": "jsr:@valkyr/json-rpc@1.0.0",
+    "@valkyr/json-rpc": "jsr:@valkyr/json-rpc@1.0.1",
     "zod": "npm:zod@3.23.8",
     "std/": "https://deno.land/std@0.224.0/"
   },
