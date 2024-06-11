@@ -8,9 +8,9 @@ api.register(
   new Method({
     method: "foo",
     description: "Fetches a foo value with the provided bar.",
-    params: {
+    params: z.object({
       bar: z.string(),
-    },
+    }),
     output: z.string(),
     handler: async ({ params: { bar } }) => {
       return bar;

@@ -1,5 +1,5 @@
 import type { RpcError } from "@valkyr/json-rpc";
-import { type TypeOf, z, type ZodObject, type ZodRawShape, type ZodTypeAny } from "zod";
+import type { z, ZodArray, ZodTypeAny } from "zod";
 
 import type { Action, RequestContext } from "./action.ts";
 
@@ -18,8 +18,8 @@ export type AnyMethod = Method<any, any, any>;
 
 export class Method<
   Actions extends Action<any>[] = any,
-  Params extends ZodRawShape = ZodRawShape,
-  Output extends ZodRawShape | ZodTypeAny | [ZodRawShape] | [ZodTypeAny] | undefined = any,
+  Params extends ZodMethodType = ZodMethodType,
+  Output extends ZodMethodType | undefined = any,
 > {
   readonly method: string;
   readonly description: string;
@@ -32,7 +32,7 @@ export class Method<
     this.method = options.method;
     this.description = options.description;
     this.actions = options.actions ?? ([] as unknown as Actions);
-    this.params = z.object(options.params).strict();
+    this.params = options.params;
     this.output = options.output;
     this.handler = options.handler;
   }
@@ -46,8 +46,8 @@ export class Method<
 
 export type MethodOptions<
   Actions extends Action<any>[] = [],
-  Params extends ZodRawShape = ZodRawShape,
-  Output extends ZodRawShape | ZodTypeAny | [ZodRawShape] | [ZodTypeAny] | undefined = any,
+  Params extends ZodMethodType = ZodMethodType,
+  Output extends ZodMethodType | undefined = any,
 > = {
   /**
    * Name of the method used to identify the JSON-RPC 2.0 handler to execute.
@@ -114,18 +114,17 @@ export type MethodOptions<
 
 type MethodHandler<
   Actions extends Action<any>[] = [],
-  Params extends ZodRawShape = ZodRawShape,
-  Output extends ZodRawShape | ZodTypeAny | [ZodRawShape] | [ZodTypeAny] | undefined = any,
+  Params extends ZodMethodType = ZodMethodType,
+  Output extends ZodMethodType | undefined = any,
 > = (
   context:
     & RequestContext
-    & { params: TypeOf<ZodObject<Params>> }
+    & { params: z.infer<Params> }
     & (Actions extends [] ? object
       : {
         [K in keyof Actions]: Actions[K] extends Action<infer P> ? P : never;
       }[number]),
-) => Output extends ZodRawShape ? Promise<TypeOf<ZodObject<Output>> | RpcError>
-  : Output extends ZodTypeAny ? Promise<TypeOf<Output> | RpcError>
-  : Output extends [ZodRawShape] ? Promise<TypeOf<ZodObject<Output[number]>>[] | RpcError>
-  : Output extends [ZodTypeAny] ? Promise<TypeOf<Output[number]>[] | RpcError>
+) => Output extends ZodMethodType ? Promise<z.infer<Output> | RpcError>
   : Promise<RpcError | void>;
+
+type ZodMethodType = ZodTypeAny | ZodArray<ZodTypeAny>;
