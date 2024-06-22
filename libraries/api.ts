@@ -12,8 +12,8 @@ import {
 import { type RequestContext, response } from "./action.ts";
 import type { Method } from "./method.ts";
 
-export class Api {
-  readonly #methods = new Map<string, Method>();
+export class Api<TContext extends RequestContext = RequestContext> {
+  readonly #methods = new Map<string, Method<TContext>>();
 
   readonly #options: Options;
 
@@ -24,7 +24,7 @@ export class Api {
   /**
    * List of registered API methods in the form of `[name, method]` tuples.
    */
-  get methods(): [string, Method][] {
+  get methods(): [string, Method<TContext>][] {
     return Array.from(this.#methods.entries());
   }
 
@@ -39,7 +39,7 @@ export class Api {
    *
    * @param method - Method instance.
    */
-  register(method: any): void {
+  register(method: Method<TContext>): void {
     this.#methods.set(method.method, method);
   }
 
@@ -58,7 +58,7 @@ export class Api {
    */
   async handle(
     request: RequestCandidate,
-    context: RequestContext,
+    context: TContext,
   ): Promise<SuccessResponse | ErrorResponse | undefined> {
     try {
       assertJsonRpcRequest(request);

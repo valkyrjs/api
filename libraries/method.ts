@@ -14,9 +14,8 @@ import type { Action, RequestContext } from "./action.ts";
  |
  */
 
-export type AnyMethod = Method<any, any, any>;
-
 export class Method<
+  TContext extends RequestContext = RequestContext,
   Actions extends Action<any>[] = any,
   Params extends ZodMethodType = ZodMethodType,
   Output extends ZodMethodType | undefined = any,
@@ -26,9 +25,9 @@ export class Method<
   readonly actions: Actions;
   readonly params: ZodTypeAny;
   readonly output?: Output;
-  readonly handler: MethodHandler<Actions, Params, Output>;
+  readonly handler: MethodHandler<TContext, Actions, Params, Output>;
 
-  constructor(options: MethodOptions<Actions, Params, Output>) {
+  constructor(options: MethodOptions<TContext, Actions, Params, Output>) {
     this.method = options.method;
     this.description = options.description;
     this.actions = options.actions ?? ([] as unknown as Actions);
@@ -44,7 +43,10 @@ export class Method<
  |--------------------------------------------------------------------------------
  */
 
+export type AnyMethod = Method<any, any, any>;
+
 export type MethodOptions<
+  TContext extends RequestContext = RequestContext,
   Actions extends Action<any>[] = [],
   Params extends ZodMethodType = ZodMethodType,
   Output extends ZodMethodType | undefined = any,
@@ -109,16 +111,17 @@ export type MethodOptions<
    *   }
    * });
    */
-  handler: MethodHandler<Actions, Params, Output>;
+  handler: MethodHandler<TContext, Actions, Params, Output>;
 };
 
 type MethodHandler<
+  TContext extends RequestContext = RequestContext,
   Actions extends Action<any>[] = [],
   Params extends ZodMethodType = ZodMethodType,
   Output extends ZodMethodType | undefined = any,
 > = (
   context:
-    & RequestContext
+    & TContext
     & { params: z.infer<Params> }
     & (Actions extends [] ? object
       : {

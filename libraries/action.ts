@@ -50,8 +50,7 @@ export type Action<P extends Record<string, unknown> = Empty> = (
  * Request context is passed into every method allowing external implementation
  * to pass in shared context functionality and values.
  */
-// deno-lint-ignore no-empty-interface
-export interface RequestContext {}
+export type RequestContext = Record<string, unknown>;
 
 type Response<P extends Record<string, unknown> = Empty> = P extends Empty ? {
     accept(): Accept;
