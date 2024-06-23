@@ -1,6 +1,6 @@
 {
   "name": "@valkyr/api",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0",
   "exports": "./mod.ts",
   "imports": {
     "@valkyr/json-rpc": "jsr:@valkyr/json-rpc@1.0.1",
