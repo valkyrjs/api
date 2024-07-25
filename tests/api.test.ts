@@ -1,14 +1,17 @@
-import { assertEquals } from "std/assert/mod.ts";
+import { assertEquals, assertRejects } from "std/assert/mod.ts";
 import { it } from "std/testing/bdd.ts";
 
-import { api } from "./mocks/api.ts";
+import { BadRequestError } from "../mod.ts";
+import { api } from "./mocks/client.ts";
 
-it("should succesfully resolve a request", async () => {
-  const response: any = await api.handle({ jsonrpc: "2.0", method: "foo", params: { bar: "foo" }, id: 1 }, {});
-  assertEquals(response.result, "foo");
+it("should handle rpc requests", async () => {
+  const name = await api.blog.users.create({ name: "John Doe" });
+  assertEquals(name, "John Doe");
+
+  const post = await api.blog.posts.create({ title: "Foo", body: "Bar", author: name });
+  assertEquals(post, "Foo | Bar | John Doe");
 });
 
-it("should throw an error when method does not exist", async () => {
-  const response: any = await api.handle({ jsonrpc: "2.0", method: "bar", id: 1 }, {});
-  assertEquals(response.error.message, "Method not found");
+it("should handle error events", async () => {
+  await assertRejects(async () => api.blog.users.create({ name: "test" }), BadRequestError, "Invalid name given");
 });

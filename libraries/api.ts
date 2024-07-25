@@ -85,13 +85,15 @@ export class Api<TContext extends RequestContext = RequestContext> {
 
     const params = request.params ?? {};
 
-    const result = await method.params.spa(params);
-    if (result.success === false) {
-      return {
-        jsonrpc: "2.0",
-        error: new InvalidParamsError(result.error.flatten().fieldErrors),
-        id: (request as any).id ?? null,
-      };
+    if (method.params !== undefined) {
+      const result = await method.params.spa(params);
+      if (result.success === false) {
+        return {
+          jsonrpc: "2.0",
+          error: new InvalidParamsError(result.error.flatten().fieldErrors),
+          id: (request as any).id ?? null,
+        };
+      }
     }
 
     // ### Run Actions

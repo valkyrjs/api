@@ -1,6 +1,8 @@
 import type { RpcError } from "@valkyr/json-rpc";
 import type { z, ZodArray, ZodTypeAny } from "zod";
 
+import { dedent } from "~utilities/dedent.ts";
+
 import type { Action, RequestContext } from "./action.ts";
 
 /*
@@ -16,24 +18,70 @@ import type { Action, RequestContext } from "./action.ts";
 
 export class Method<
   TContext extends RequestContext = RequestContext,
-  Actions extends Action<any>[] = any,
-  Params extends ZodMethodType = ZodMethodType,
-  Output extends ZodMethodType | undefined = any,
+  TActions extends Action<any>[] = any,
+  TParams extends ZodMethodType = ZodMethodType,
+  TOutput extends ZodMethodType | undefined = any,
 > {
   readonly method: string;
   readonly description: string;
-  readonly actions: Actions;
-  readonly params: ZodTypeAny;
-  readonly output?: Output;
-  readonly handler: MethodHandler<TContext, Actions, Params, Output>;
+  readonly notification: boolean;
+  readonly actions: TActions;
+  readonly params?: ZodTypeAny;
+  readonly output?: TOutput;
+  readonly handler: MethodHandler<TContext, TActions, TParams, TOutput>;
+  readonly examples?: string[];
 
-  constructor(options: MethodOptions<TContext, Actions, Params, Output>) {
+  #meta?: {
+    file: string;
+    location: string[];
+  };
+
+  constructor(options: MethodOptions<TContext, TActions, TParams, TOutput>) {
     this.method = options.method;
     this.description = options.description;
-    this.actions = options.actions ?? ([] as unknown as Actions);
+    this.notification = options.notification ?? false;
+    this.actions = options.actions ?? [] as unknown as TActions;
     this.params = options.params;
     this.output = options.output;
     this.handler = options.handler;
+    this.examples = options.examples?.map((example) => dedent(example));
+  }
+
+  /**
+   * Get the name of the file this method was registered in.
+   */
+  get file(): string {
+    if (this.#meta === undefined) {
+      throw new Error("Route Violation: Cannot get 'file', meta data has not been resolved.");
+    }
+    return this.#meta.file;
+  }
+
+  /**
+   * Get the location array of the route. This is the base folder locations of
+   * the route used in client generation.
+   *
+   * When the route is located in `foo/routes/bar/get-bars.ts` the location
+   * will be `["foo", "bar"]`.
+   */
+  get location(): string[] {
+    if (this.#meta === undefined) {
+      throw new Error("Route Violation: Cannot get 'location', meta data has not been resolved.");
+    }
+    return this.#meta.location;
+  }
+
+  /**
+   * Set the file meta details of the method which is used for api printer.
+   *
+   * When the method is located in `foo/methods/bar/get-bars.ts` the file will
+   * be `get-bars.ts` and the location will be `["foo", "bar"]`.
+   *
+   * @param file     - Name of the file the method resides within.
+   * @param location - Nested location the method file is located.
+   */
+  meta(file: string, location: string[]) {
+    this.#meta = { file, location };
   }
 }
 
@@ -47,9 +95,9 @@ export type AnyMethod = Method<any, any, any>;
 
 export type MethodOptions<
   TContext extends RequestContext = RequestContext,
-  Actions extends Action<any>[] = [],
-  Params extends ZodMethodType = ZodMethodType,
-  Output extends ZodMethodType | undefined = any,
+  TActions extends Action<any>[] = [],
+  TParams extends ZodMethodType = ZodMethodType,
+  TOutput extends ZodMethodType | undefined = any,
 > = {
   /**
    * Name of the method used to identify the JSON-RPC 2.0 handler to execute.
@@ -63,6 +111,12 @@ export type MethodOptions<
   description: string;
 
   /**
+   * Is this endpoint a notification, in which case it will not produce
+   * a response for the request.
+   */
+  notification?: boolean;
+
+  /**
    * A list of methods to execute before the request is passed to the method
    * handler. This can be used to perform a wide variety of tasks.
    *
@@ -70,7 +124,7 @@ export type MethodOptions<
    *
    * new Method({ method: "Users.Create", actions: [isAuthenticated] });
    */
-  actions?: Actions;
+  actions?: TActions;
 
   /**
    * The params of the request using Zod validation and casting before passing
@@ -91,12 +145,12 @@ export type MethodOptions<
    *   }
    * });
    */
-  params: Params;
+  params?: TParams;
 
   /**
    * Response output produced by the method handler.
    */
-  output?: Output;
+  output?: TOutput;
 
   /**
    * Route handler which will be executed when the method is triggered.
@@ -111,23 +165,28 @@ export type MethodOptions<
    *   }
    * });
    */
-  handler: MethodHandler<TContext, Actions, Params, Output>;
+  handler: MethodHandler<TContext, TActions, TParams, TOutput>;
+
+  /**
+   * Examples for how to call the method.
+   */
+  examples?: string[];
 };
 
 type MethodHandler<
   TContext extends RequestContext = RequestContext,
-  Actions extends Action<any>[] = [],
-  Params extends ZodMethodType = ZodMethodType,
-  Output extends ZodMethodType | undefined = any,
+  TActions extends Action<any>[] = [],
+  TParams extends ZodMethodType | undefined = undefined,
+  TOutput extends ZodMethodType | undefined = any,
 > = (
   context:
     & TContext
-    & { params: z.infer<Params> }
-    & (Actions extends [] ? object
+    & (TParams extends ZodMethodType ? { params: z.infer<TParams> } : {})
+    & (TActions extends [] ? object
       : {
-        [K in keyof Actions]: Actions[K] extends Action<infer P> ? P : never;
+        [K in keyof TActions]: TActions[K] extends Action<infer P> ? P : never;
       }[number]),
-) => Output extends ZodMethodType ? Promise<z.infer<Output> | RpcError>
+) => TOutput extends ZodMethodType ? Promise<z.infer<TOutput> | RpcError>
   : Promise<RpcError | void>;
 
 type ZodMethodType = ZodTypeAny | ZodArray<ZodTypeAny>;
