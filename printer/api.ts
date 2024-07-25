@@ -1,3 +1,5 @@
+import { writeFile } from "node:fs/promises";
+
 import { format } from "prettier";
 
 import type { Method } from "../libraries/method.ts";
@@ -9,7 +11,7 @@ export async function printApi(outputPaths: string[], methods: Method[]) {
   const content = new TextEncoder().encode(
     await format(
       `
-        import type { ErrorResponse, Notification, Request, SuccessResponse } from "@valkyr/api/json-rpc";
+        import type { ErrorResponse, Notification, Request, SuccessResponse } from "@valkyr/json-rpc";
 
         export class Api {
           readonly #config: Config;
@@ -67,12 +69,9 @@ export async function printApi(outputPaths: string[], methods: Method[]) {
   );
   for (const outputPath of outputPaths) {
     await ensureDir(outputPath);
-    await Deno.writeFile(
+    await writeFile(
       outputPath,
       content,
-      {
-        create: true,
-      },
     );
   }
 }

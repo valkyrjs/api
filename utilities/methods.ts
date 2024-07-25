@@ -1,3 +1,5 @@
+import { readdir } from "node:fs/promises";
+
 import { getProperty, setProperty } from "dot-prop";
 
 import { Method } from "~libraries/method.ts";
@@ -38,8 +40,8 @@ export function getMappedMethods(methods: Method[]) {
 export async function resolveMethods(path: string, filter: string[] = [], methods: Method[] = []): Promise<Method[]> {
   const modules = await getModules(path, filter);
   for (const { name, path } of modules) {
-    for await (const entry of Deno.readDir(path)) {
-      if (entry.isDirectory === true && entry.name === "methods") {
+    for (const entry of await readdir(path, { withFileTypes: true })) {
+      if (entry.isDirectory() === true && entry.name === "methods") {
         await loadMethods(`${path}/methods`, methods, [name]);
       }
     }
@@ -48,8 +50,8 @@ export async function resolveMethods(path: string, filter: string[] = [], method
 }
 
 async function loadMethods(path: string, methods: Method[], modules: string[]): Promise<void> {
-  for await (const entry of Deno.readDir(path)) {
-    if (entry.isDirectory === true) {
+  for (const entry of await readdir(path, { withFileTypes: true })) {
+    if (entry.isDirectory() === true) {
       await loadMethods(`${path}/${entry.name}`, methods, [...modules, entry.name]);
     } else {
       if (!entry.name.endsWith(".ts") && !entry.name.endsWith(".js")) {

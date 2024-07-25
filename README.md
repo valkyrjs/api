@@ -2,9 +2,13 @@
   <img src="https://user-images.githubusercontent.com/1998130/229430454-ca0f2811-d874-4314-b13d-c558de8eec7e.svg" />
 </p>
 
-# API _JSON-RPC 2.0 Request Handler_
+# API
 
 A robust application programming interface for managing and handling JSON-RPC 2.0 compliant requests.
+
+## Dependencies
+
+Make sure to install [@valkyr/json-rpc](https://jsr.io/@valkyr/json-rpc) if using the api client generator.
 
 ## Quick Start Guide
 
@@ -12,7 +16,7 @@ This guide provides a concise introduction to get you up and running quickly.
 
 ### Server-Side Setup
 
-1. Create an API file and export a new API instance:
+Create an API file and export a new API instance:
 
 ```typescript
 import { Api } from "@valkyr/api";
@@ -20,7 +24,7 @@ import { Api } from "@valkyr/api";
 export const api = new Api();
 ```
 
-2. Register methods with the API. There are multiple approaches to achieve this:
+Register methods with the API. There are multiple approaches to achieve this:
 
 #### Method Registration
 
@@ -83,7 +87,7 @@ for (const method of await resolveMethods("/path/to/modules")) {
 }
 ```
 
-3. Use the API instance to handle incoming events. This library is designed to be HTTP-layer agnostic. Here's an example using Deno:
+Use the API instance to handle incoming events. This library is designed to be HTTP-layer agnostic. Here's an example using Deno:
 
 ```typescript
 Deno.serve({
