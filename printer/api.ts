@@ -9,7 +9,7 @@ export async function printApi(outputPaths: string[], methods: Method[]) {
   const content = new TextEncoder().encode(
     await format(
       `
-        import type { ErrorResponse, Notification, Request, SuccessResponse } from "@valkyr/json-rpc";
+        import type { ErrorResponse, Notification, Request, SuccessResponse } from "@valkyr/api/json-rpc";
 
         export class Api {
           readonly #config: Config;
