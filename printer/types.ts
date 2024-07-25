@@ -29,12 +29,12 @@ function getMethods(map: any): string {
   for (const name in map) {
     const value = map[name];
     if (name === "methods") {
-      result.push(map[name].map(getRequestTypes).join(",\n\n"));
+      result.push(map[name].map(getRequestTypes).join("\n\n"));
     } else {
       result.push(addMethod(name, value));
     }
   }
-  return result.join(",\n\n");
+  return result.join("\n\n");
 }
 
 // deno-lint-ignore no-explicit-any

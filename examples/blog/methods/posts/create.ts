@@ -3,7 +3,7 @@ import { z } from "zod";
 import { Method } from "~libraries/method.ts";
 
 export default new Method({
-  method: "posts:create",
+  method: "blog:posts:create",
   description: "Create a new post.",
   params: z.object({
     title: z.string().describe("Title of the post."),

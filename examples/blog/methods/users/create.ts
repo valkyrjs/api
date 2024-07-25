@@ -4,7 +4,7 @@ import { BadRequestError } from "~libraries/errors.ts";
 import { Method } from "~libraries/method.ts";
 
 export default new Method({
-  method: "users:create",
+  method: "account:users:create",
   description: "Create a new user.",
   params: z.object({
     name: z.string().describe("Full name of the user."),
