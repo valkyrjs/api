@@ -32,6 +32,15 @@
   "fmt": {
     "lineWidth": 165
   },
+  "publish": {
+    "exclude": [
+      ".eslint",
+      ".github",
+      ".vscode",
+      ".gitignore",
+      "tests"
+    ]
+  },
   "tasks": {
     "test": "deno task generate && deno test -A tests/",
     "lint": "npx eslint -c .eslint/eslint.config.mjs .",
