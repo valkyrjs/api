@@ -1,5 +1,5 @@
-import { assertEquals, assertRejects } from "std/assert/mod.ts";
-import { it } from "std/testing/bdd.ts";
+import { assertEquals, assertRejects } from "@std/assert";
+import { it } from "@std/testing/bdd";
 
 import { BadRequestError } from "../mod.ts";
 import { api } from "./mocks/client.ts";

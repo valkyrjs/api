@@ -1,4 +1,4 @@
-import pascalCase from "case/pascalCase.ts";
+import { pascalCase } from "change-case";
 import { printNode, zodToTs } from "zod-to-ts";
 
 import type { Method } from "~libraries/method.ts";

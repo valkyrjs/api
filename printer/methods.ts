@@ -1,5 +1,4 @@
-import camelCase from "case/camelCase.ts";
-import pascalCase from "case/pascalCase.ts";
+import { camelCase, pascalCase } from "change-case";
 import { ZodObject, type ZodTypeAny } from "zod";
 
 import type { Method } from "../libraries/method.ts";
